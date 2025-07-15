@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Student;
+use Illuminate\Support\Facades\Storage;
 class StudentController extends Controller{
     public function index(){
         $etudients=Student::all();
@@ -15,20 +16,21 @@ class StudentController extends Controller{
     }
     public function store(Request $request){
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'image' => 'nullable|image|max:2048',
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:students,email',
+            'image' => 'required|image|max:2048',
         ]);
 
-        $student = new Student();
-        $student->name = $request->name;
-        $student->email = $request->email;
+        $image = $request->file('image');
+        $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+        Storage::disk('s3')->put("students/{$filename}", file_get_contents($image), 'public');
+        $imageUrl = Storage::disk('s3')->url("students/{$filename}");
+        Student::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'image' => $imageUrl,
+        ]);
 
-        if ($request->hasFile('image')) {
-            $student->image = $request->file('image')->store('images', 'public');
-        }
-
-        $student->save();
         return redirect()->route('students.index')->with('success', 'Student created successfully.');
     }
     public function edit($id){

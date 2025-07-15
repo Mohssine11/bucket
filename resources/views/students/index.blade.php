@@ -22,7 +22,7 @@
         <tbody>
             @foreach($etudients as $etudient)
             <tr>
-                <td><img src="{{ asset('storage/' . $etudient->image) }}" alt="Student Image" width="50"></td>
+                <td><img src="{{ $etudient->image }}" alt="Student Image" width="50"></td>
                 <td>{{ $etudient->id }}</td>
                 <td>{{ $etudient->name }}</td>
                 <td>{{ $etudient->email }}</td>
