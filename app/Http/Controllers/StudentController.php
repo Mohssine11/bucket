@@ -18,29 +18,37 @@ class StudentController extends Controller
         return view('students.create');
     }
     public function store(Request $request)
-{
-    $request->validate([
-        'name'  => 'required|string|max:255',
-        'email' => 'required|email|unique:students,email',
-        'image' => 'required|image|max:2048',
-    ]);
+    {
+        // ✅ تحقق من صحة البيانات
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:students,email',
+            'image' => 'required|image|max:2048',
+        ]);
 
-    $imageUrl = null;
-    if ($request->hasFile('image')) {
-        $image = $request->file('image');
-        $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-        Storage::disk('s3')->put("students/{$filename}", file_get_contents($image), 'public');
-        $imageUrl = Storage::disk('s3')->url("students/{$filename}");
+        // ✅ رفع الصورة إلى S3
+        $imageUrl = null;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+
+            // نستخدم put أو putFile – كلاهما مقبول
+            Storage::disk('s3')->put("students/{$filename}", file_get_contents($image), [
+                'visibility' => 'public', // ⚠️ مهم للوصول العلني
+            ]);
+
+            $imageUrl = Storage::disk('s3')->url("students/{$filename}");
+        }
+
+        // ✅ حفظ الطالب في قاعدة البيانات
+        Student::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'image' => $imageUrl,
+        ]);
+
+        return redirect()->route('students.index')->with('success', 'Student created successfully.');
     }
-
-    Student::create([
-        'name'  => $request->name,
-        'email' => $request->email,
-        'image' => $imageUrl,
-    ]);
-
-    return redirect()->route('students.index')->with('success', 'Student created successfully.');
-}
     public function edit($id)
     {
         $student = Student::findOrFail($id);
