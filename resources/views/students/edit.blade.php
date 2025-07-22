@@ -1,28 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Edit Student</title>
 </head>
 <body>
-    
-    <form action="{{route('update', $student->id)}}" method="post" enctype="multipart/form-data">
+    <h1>Edit Student</h1>
+
+    @if($errors->any())
+        <ul style="color: red;">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    @endif
+
+    <form action="{{ route('update', $student->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
-        <label for="name">Name:</label>
-        <input type="text" name="name" id="name" value="{{ $student->name }}" required>
-        
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" value="{{ $student->email }}" required>
-        
-        <label for="image">Image:</label>
-        <input type="file" name="image" id="image">
-        
-        <button type="submit">Update</button>
+        <label>Name:</label>
+        <input type="text" name="name" value="{{ old('name', $student->name) }}"><br><br>
 
+        <label>Email:</label>
+        <input type="email" name="email" value="{{ old('email', $student->email) }}"><br><br>
+
+        <label>Image:</label><br>
+        @if($student->image)
+            <img src="{{ $student->image }}" width="100"><br>
+        @endif
+        <input type="file" name="image"><br><br>
+
+        <button type="submit">Update</button>
     </form>
 
+    <a href="{{ route('students.index') }}">Back to List</a>
 </body>
 </html>

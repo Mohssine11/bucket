@@ -1,42 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>All Students</title>
 </head>
 <body>
-    <a href="{{ route('create') }}">Add Student</a>
     <h1>Students List</h1>
+
+    @if(session('success'))
+        <p style="color: green;">{{ session('success') }}</p>
+    @endif
+
+    <a href="{{ route('create') }}">Add Student</a>
+
     <table border="1" cellpadding="10" cellspacing="0">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Image</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($etudients as $etudient)
-            <tr>
-                <td><img src="{{ $etudient->image }}" alt="Student Image" width="50"></td>
-                <td>{{ $etudient->id }}</td>
-                <td>{{ $etudient->name }}</td>
-                <td>{{ $etudient->email }}</td>
-                <td>
-                    <a href="{{ route('edit', $etudient->id) }}">Edit</a>
-                    <form action="{{ route('delete', $etudient->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit">Delete</button>
-                    </form>
-                    <a href="{{ route('show', $etudient->id) }}">Show</a>
-            </tr>
-            @endforeach
-        </tbody>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+        @foreach($students as $student)
+        <tr>
+            <td>{{ $student->name }}</td>
+            <td>{{ $student->email }}</td>
+            <td>
+                @if($student->image)
+                    <img src="{{ $student->image }}" width="100">
+                @endif
+            </td>
+            <td>
+                <a href="{{ route('show', $student->id) }}">View</a>
+                <a href="{{ route('edit', $student->id) }}">Edit</a>
+                <form action="{{ route('delete', $student->id) }}" method="POST" style="display:inline-block;">
+                    @csrf
+                    @method('DELETE')
+                    <button onclick="return confirm('Are you sure?')" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        @endforeach
     </table>
 </body>
 </html>

@@ -1,15 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>View Student</title>
 </head>
 <body>
-    
-    <h1>{{$student->name}}</h1>
-    <p>Email: {{$student->email}}</p>
-    <img src="{{ asset('storage/' . $student->image) }}" alt="Student Image" width="200">
+    <h1>Student Details</h1>
+
+    <p><strong>Name:</strong> {{ $student->name }}</p>
+    <p><strong>Email:</strong> {{ $student->email }}</p>
+    <p><strong>Image:</strong><br>
+        @if($student->image)
+            <img src="{{ $student->image }}" width="150">
+        @else
+            No image.
+        @endif
+    </p>
+
+    <a href="{{ route('students.index') }}">Back to List</a>
 </body>
 </html>
